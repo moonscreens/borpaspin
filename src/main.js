@@ -133,43 +133,44 @@ ChatInstance.on("emotes", (emotes) => {
 const borpaMaterials = [
     new THREE.MeshLambertMaterial({
         color: new THREE.Color(0x22B14C),
-        side: THREE.DoubleSide,
     }),
     new THREE.MeshLambertMaterial({
         color: new THREE.Color(0xFFFFFF),
-        side: THREE.DoubleSide,
     }),
     new THREE.MeshLambertMaterial({
         color: new THREE.Color(0xC7835E),
-        side: THREE.DoubleSide,
     }),
     new THREE.MeshLambertMaterial({
         color: new THREE.Color(0xC7835E),
-        side: THREE.DoubleSide,
     }),
     new THREE.MeshLambertMaterial({
         color: new THREE.Color(0x3F48CC),
-        side: THREE.DoubleSide,
     })
 ];
+for (let index = 0; index < borpaMaterials.length; index++) {
+    const element = borpaMaterials[index];
+    element.side = THREE.DoubleSide;
+    element.flatShading = false;
+}
 
 const loader = new FBXLoader();
 loader.load('Borpa.fbx', function (object) {
     borpa = object;
     borpa.traverse(function (child) {
         if (child.isMesh) {
+            child.geometry.computeVertexNormals(true);
             child.material = borpaMaterials;
-            /*for (let index = 0; index < child.material.length; index++) {
-                const mat = child.material[index];
-                mat.map = false;
-                mat.fog = false;
-                mat.emissive.r = Math.random();
-                mat.emissive.g = Math.random();
-                mat.emissive.b = Math.random();
-                mat.transparent = false;
-                mat.side = THREE.DoubleSide;
-                console.log(mat);
-            }*/
+            // for (let index = 0; index < child.material.length; index++) {
+            //     const mat = child.material[index];
+            //     mat.map = false;
+            //     mat.fog = false;
+            //     mat.emissive.r = Math.random();
+            //     mat.emissive.g = Math.random();
+            //     mat.emissive.b = Math.random();
+            //     mat.transparent = false;
+            //     mat.side = THREE.DoubleSide;
+            //     console.log(mat);
+            // }
             child.castShadow = true;
             child.receiveShadow = true;
         }
