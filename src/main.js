@@ -36,8 +36,12 @@ const renderer = new THREE.WebGLRenderer({
 });
 document.body.appendChild(renderer.domElement);
 
-const light = new THREE.AmbientLight(0xFFFFFF); // soft white light
+const light = new THREE.AmbientLight(0x444444); // soft white light
 scene.add(light);
+
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // soft white light
+scene.add(directionalLight);
 
 function resize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -126,17 +130,46 @@ ChatInstance.on("emotes", (emotes) => {
 })
 
 
+const borpaMaterials = [
+    new THREE.MeshLambertMaterial({
+        color: new THREE.Color(0x22B14C),
+        side: THREE.DoubleSide,
+    }),
+    new THREE.MeshLambertMaterial({
+        color: new THREE.Color(0xFFFFFF),
+        side: THREE.DoubleSide,
+    }),
+    new THREE.MeshLambertMaterial({
+        color: new THREE.Color(0xC7835E),
+        side: THREE.DoubleSide,
+    }),
+    new THREE.MeshLambertMaterial({
+        color: new THREE.Color(0xC7835E),
+        side: THREE.DoubleSide,
+    }),
+    new THREE.MeshLambertMaterial({
+        color: new THREE.Color(0x3F48CC),
+        side: THREE.DoubleSide,
+    })
+];
 
 const loader = new FBXLoader();
 loader.load('Borpa.fbx', function (object) {
     borpa = object;
     borpa.traverse(function (child) {
         if (child.isMesh) {
-            for (let index = 0; index < child.material.length; index++) {
+            child.material = borpaMaterials;
+            /*for (let index = 0; index < child.material.length; index++) {
                 const mat = child.material[index];
+                mat.map = false;
+                mat.fog = false;
+                mat.emissive.r = Math.random();
+                mat.emissive.g = Math.random();
+                mat.emissive.b = Math.random();
                 mat.transparent = false;
-                mat.side = THREE.DoubleSide
-            }
+                mat.side = THREE.DoubleSide;
+                console.log(mat);
+            }*/
             child.castShadow = true;
             child.receiveShadow = true;
         }
