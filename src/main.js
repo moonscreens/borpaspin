@@ -176,6 +176,23 @@ loader.load('Borpa.fbx', function (object) {
         }
     });
 
+    const pupilGeometry = new THREE.SphereBufferGeometry(10);
+    const pupilMat = new THREE.MeshLambertMaterial({
+        color: 0x222222,
+        side: THREE.DoubleSide,
+    });
+    const leftPupil = new THREE.Mesh(pupilGeometry, pupilMat);
+    leftPupil.position.z = 201;
+    leftPupil.position.y = 86;
+    leftPupil.position.x = -31.5;
+    borpa.add(leftPupil);
+
+    const rightPupil = new THREE.Mesh(pupilGeometry, pupilMat);
+    rightPupil.position.z = 208;
+    rightPupil.position.y = 65.25;
+    rightPupil.position.x = 28;
+    borpa.add(rightPupil);
+
     scene.add(borpa);
     borpa.scale.setScalar(0.02);
 });
