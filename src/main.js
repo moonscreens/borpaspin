@@ -62,9 +62,9 @@ function draw() {
 
     try {
         //borpa.rotation.addScalar(delta * 100);
-        borpa.rotation.x += delta / 10;
-        borpa.rotation.y += delta / 10;
-        borpa.rotation.z += delta / 10;
+        borpa.rotation.x = Math.sin((Date.now() / 10000) * Math.PI );
+        borpa.rotation.y = Math.cos((Date.now() / 10000) * Math.PI );
+        borpa.rotation.z = Math.tan((Date.now() / 10000) * Math.PI );
     } catch (e) {}
 
     // update materials for animated emotes
