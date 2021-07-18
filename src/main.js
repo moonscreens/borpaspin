@@ -90,11 +90,9 @@ function draw() {
     for (let index = emoteArray.length - 1; index >= 0; index--) {
         const element = emoteArray[index];
 
-        if (index % 2) {
-            element.position.z += delta;
-        } else {
-            element.position.z -= delta;
-        }
+        element.rotation.x += element.velocity.x * delta;
+        element.rotation.y += element.velocity.y * delta;
+        element.rotation.z += element.velocity.z * delta;
 
         if (element.dateSpawned < Date.now() - 10000) {
             scene.remove(element);
@@ -107,13 +105,26 @@ function draw() {
     lastFrame = Date.now();
 }
 
+function random3DDirection() {
+    const x = Math.random() * 2 - 1;
+    const y = Math.random() * 2 - 1;
+    const z = Math.random() * 2 - 1;
+    const vector = new THREE.Vector3(x, y, z);
+    vector.normalize();
+    return vector;
+}
+
 // add a callback function for when a new message with emotes is sent
+const emoteSpawnDistance = 5;
 const emoteArray = [];
 ChatInstance.on("emotes", (emotes) => {
     const group = new THREE.Group();
 
-    group.position.x = Math.random() * 5 - 2.5;
-    group.position.y = Math.random() * 5 - 2.5;
+    group.velocity = random3DDirection();
+    const offset = random3DDirection().multiplyScalar(emoteSpawnDistance);
+
+    //group.position.x = Math.random() * 5 - 2.5;
+    //group.position.y = Math.random() * 5 - 2.5;
     group.dateSpawned = Date.now();
 
     for (let index = 0; index < emotes.length; index++) {
@@ -133,7 +144,8 @@ ChatInstance.on("emotes", (emotes) => {
             });
         }
         const sprite = new THREE.Sprite(emoteMaterials[emote.id]);
-        sprite.position.x = index;
+        sprite.position.copy(offset);
+        sprite.position.x += index;
 
         group.add(sprite);
     }
