@@ -1,6 +1,9 @@
+import SimplexNoise from "simplex-noise";
 import * as THREE from "three";
 import Chat from 'twitch-chat-emotes';
 import { FBXLoader } from './fbxloader/FBXLoader.js';
+
+const simplex = new SimplexNoise();
 
 // a default array of twitch channels to join
 let channels = ['moonmoon'];
@@ -52,6 +55,8 @@ resize();
 window.addEventListener('resize', resize);
 
 
+let rotationVelocity = new THREE.Vector3();
+
 let lastFrame = Date.now();
 // Called once per frame
 function draw() {
@@ -60,12 +65,19 @@ function draw() {
     // number of seconds since the last frame was drawn
     const delta = (Date.now() - lastFrame) / 1000;
 
+    const noise1 = simplex.noise4D(1, 0, 0, Date.now() / 3000);
+    const noise2 = simplex.noise4D(0, 1, 0, Date.now() / 3000);
+    const noise3 = simplex.noise4D(0, 0, 1, Date.now() / 3000);
+    rotationVelocity.x = noise1;
+    rotationVelocity.y = noise2;
+    rotationVelocity.z = noise3;
+
     try {
         //borpa.rotation.addScalar(delta * 100);
-        borpa.rotation.x = Math.sin((Date.now() / 10000) * Math.PI );
-        borpa.rotation.y = Math.cos((Date.now() / 10000) * Math.PI );
-        borpa.rotation.z = Math.tan((Date.now() / 10000) * Math.PI );
-    } catch (e) {}
+        borpa.rotation.x += delta * rotationVelocity.x;
+        borpa.rotation.y += delta * rotationVelocity.y;
+        borpa.rotation.z += delta * rotationVelocity.z;
+    } catch (e) { }
 
     // update materials for animated emotes
     for (const key in emoteMaterials) {
@@ -100,9 +112,9 @@ const emoteArray = [];
 ChatInstance.on("emotes", (emotes) => {
     const group = new THREE.Group();
 
-    group.position.x = Math.random() * 5 - 2.5,
-        group.position.y = Math.random() * 5 - 2.5,
-        group.dateSpawned = Date.now()
+    group.position.x = Math.random() * 5 - 2.5;
+    group.position.y = Math.random() * 5 - 2.5;
+    group.dateSpawned = Date.now();
 
     for (let index = 0; index < emotes.length; index++) {
         const emote = emotes[index];
