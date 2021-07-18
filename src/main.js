@@ -21,7 +21,8 @@ if (query_vars.channels) {
 // create our chat instance
 const ChatInstance = new Chat({
     channels,
-    duplicateEmoteLimit: 5,
+    duplicateEmoteLimit: 1,
+    maximumEmoteLimit: 3,
 });
 
 const emoteSources = {};
