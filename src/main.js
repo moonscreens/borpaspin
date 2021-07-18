@@ -116,12 +116,12 @@ function random3DDirection() {
 }
 
 // add a callback function for when a new message with emotes is sent
-const emoteSpawnDistance = 5;
+const emoteSpawnDistance = 6;
 const emoteArray = [];
 ChatInstance.on("emotes", (emotes) => {
     const group = new THREE.Group();
 
-    group.velocity = random3DDirection();
+    group.velocity = random3DDirection().multiplyScalar(0.5);
     const offset = random3DDirection().multiplyScalar(emoteSpawnDistance);
 
     //group.position.x = Math.random() * 5 - 2.5;
