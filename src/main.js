@@ -29,6 +29,7 @@ const emoteSources = {};
 const emoteTextures = {};
 const emoteMaterials = {};
 let borpa = false;
+const borpaScale = 0.02;
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
 camera.position.z = 10;
@@ -76,8 +77,10 @@ function draw() {
     try {
         //borpa.rotation.addScalar(delta * 100);
         borpa.rotation.x += delta * rotationVelocity.x;
-        borpa.rotation.y += delta * rotationVelocity.y;
+        borpa.rotation.y += delta * rotationVelocity.y * 2;
         borpa.rotation.z += delta * rotationVelocity.z;
+
+        borpa.scale.setScalar(((Math.sin(Date.now() / 30000) / 2 + 0.5) * 0.75 + 0.25) * borpaScale);
     } catch (e) { }
 
     // update materials for animated emotes
@@ -121,8 +124,10 @@ const emoteArray = [];
 ChatInstance.on("emotes", (emotes) => {
     const group = new THREE.Group();
 
-    group.velocity = random3DDirection().multiplyScalar(0.5);
-    const offset = random3DDirection().multiplyScalar(emoteSpawnDistance);
+    group.velocity = random3DDirection().multiplyScalar(Math.random() * 0.9 + 0.05);
+    const distanceMult = (Math.random() / 2 + 0.5);
+    group.scale.setScalar(distanceMult);
+    const offset = random3DDirection().multiplyScalar(emoteSpawnDistance * distanceMult);
 
     //group.position.x = Math.random() * 5 - 2.5;
     //group.position.y = Math.random() * 5 - 2.5;
@@ -181,6 +186,9 @@ for (let index = 0; index < borpaMaterials.length; index++) {
 const loader = new FBXLoader();
 loader.load('Borpa.fbx', function (object) {
     borpa = object;
+    borpa.rotation.x = Math.random() * Math.PI * 2;
+    borpa.rotation.y = Math.random() * Math.PI * 2;
+    borpa.rotation.z = Math.random() * Math.PI * 2;
     borpa.traverse(function (child) {
         if (child.isMesh) {
             child.geometry.computeVertexNormals(true);
@@ -219,7 +227,7 @@ loader.load('Borpa.fbx', function (object) {
     borpa.add(rightPupil);
 
     scene.add(borpa);
-    borpa.scale.setScalar(0.02);
+    borpa.scale.setScalar(borpaScale);
 });
 
 draw();
