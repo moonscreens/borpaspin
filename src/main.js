@@ -15,23 +15,24 @@ let channels = ['moonmoon'];
 // the following few lines of code will allow you to add ?channels=channel1,channel2,channel3 to the URL in order to override the default array of channels
 const query_vars = {};
 const query_parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
-	query_vars[key] = value;
+    query_vars[key] = value;
 });
 
 if (query_vars.channels) {
-	channels = query_vars.channels.split(',');
+    channels = query_vars.channels.split(',');
 }
 
 const ChatInstance = new TwitchChat({
-	// If using planes, consider using MeshBasicMaterial instead of SpriteMaterial
-	materialType: THREE.SpriteMaterial,
+    // If using planes, consider using MeshBasicMaterial instead of SpriteMaterial
+    materialType: THREE.MeshBasicMaterial,
 
-	// Passed to material options
-	materialOptions: {
-		transparent: true,
-	},
+    // Passed to material options
+    materialOptions: {
+        side: THREE.DoubleSide,
+        transparent: true,
+    },
 
-	channels,
+    channels,
     duplicateEmoteLimit: 1,
     maximumEmoteLimit: 3,
 })
@@ -47,14 +48,36 @@ const renderer = new THREE.WebGLRenderer({
     antialias: false,
     alpha: false
 });
+renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 
-const light = new THREE.AmbientLight(0x444444); // soft white light
+const light = new THREE.AmbientLight(0xFFFFFF, 0.3); // soft white light
 scene.add(light);
 
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // soft white light
-scene.add(directionalLight);
+const topLight = new THREE.SpotLight(0xffffff, 1, 20, 20, 1, 0); // soft white light
+topLight.position.set(0, 10, 0);
+topLight.lookAt(new THREE.Vector3(0, 0, 0));
+
+scene.add(topLight);
+topLight.castShadow = true;
+topLight.shadow.mapSize.width = 1024;
+topLight.shadow.mapSize.height = 1024;
+topLight.shadow.camera.near = 6;
+topLight.shadow.camera.far = 15;
+topLight.shadow.bias = -0.01;
+
+
+const backLight = new THREE.SpotLight(0xff0000, 2, 20, 20, 1, 0); // soft white light
+backLight.position.set(7, -7, -10);
+backLight.lookAt(new THREE.Vector3(0, 0, 0));
+
+scene.add(backLight);
+backLight.castShadow = true;
+backLight.shadow.mapSize.width = 1024;
+backLight.shadow.mapSize.height = 1024;
+backLight.shadow.camera.near = 6;
+backLight.shadow.camera.far = 15;
 
 function resize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -88,7 +111,7 @@ function draw() {
         borpa.rotation.y += delta * rotationVelocity.y * 2;
         borpa.rotation.z += delta * rotationVelocity.z;
 
-        borpa.scale.setScalar(((Math.sin(Date.now() / 30000) / 2 + 0.5) * 0.75 + 0.25) * borpaScale);
+        borpa.scale.setScalar(((Math.sin(Date.now() / 30000) / 2 + 0.5) * 0.5 + 0.25) * borpaScale);
     } catch (e) { }
 
     for (let index = emoteArray.length - 1; index >= 0; index--) {
@@ -121,6 +144,7 @@ function random3DDirection() {
 // add a callback function for when a new message with emotes is sent
 const emoteSpawnDistance = 6;
 const emoteArray = [];
+const emoteGeometry = new THREE.PlaneBufferGeometry(1, 1);
 ChatInstance.listen((emotes) => {
     const group = new THREE.Group();
 
@@ -135,11 +159,12 @@ ChatInstance.listen((emotes) => {
 
     for (let index = 0; index < emotes.length; index++) {
         const emote = emotes[index];
-        const sprite = new THREE.Sprite(emote.material);
-        sprite.position.copy(offset);
-        sprite.position.x += index;
+        const mesh = new THREE.Mesh(emoteGeometry, emote.material);
+        mesh.position.copy(offset);
+        mesh.position.x += index;
+        mesh.lookAt(new THREE.Vector3(0, 0, 0));
 
-        group.add(sprite);
+        group.add(mesh);
     }
     scene.add(group);
     emoteArray.push(group);
@@ -147,26 +172,26 @@ ChatInstance.listen((emotes) => {
 
 
 const borpaMaterials = [
-    new THREE.MeshLambertMaterial({
+    new THREE.MeshPhongMaterial({
         color: new THREE.Color(0x22B14C),
     }),
-    new THREE.MeshLambertMaterial({
+    new THREE.MeshPhongMaterial({
         color: new THREE.Color(0xFFFFFF),
     }),
-    new THREE.MeshLambertMaterial({
+    new THREE.MeshPhongMaterial({
         color: new THREE.Color(0xC7835E),
     }),
-    new THREE.MeshLambertMaterial({
+    new THREE.MeshPhongMaterial({
         color: new THREE.Color(0xC7835E),
     }),
-    new THREE.MeshLambertMaterial({
+    new THREE.MeshPhongMaterial({
         color: new THREE.Color(0x3F48CC),
     })
 ];
 for (let index = 0; index < borpaMaterials.length; index++) {
     const element = borpaMaterials[index];
     element.side = THREE.DoubleSide;
-    element.flatShading = false;
+    element.flatShading = true;
 }
 
 const loader = new FBXLoader();
@@ -211,6 +236,9 @@ loader.load('Borpa.fbx', function (object) {
     rightPupil.position.y = 65.25;
     rightPupil.position.x = 28;
     borpa.add(rightPupil);
+
+    borpa.castShadow = true;
+    borpa.receiveShadow = true;
 
     scene.add(borpa);
     borpa.scale.setScalar(borpaScale);
