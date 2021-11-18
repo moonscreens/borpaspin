@@ -1,9 +1,13 @@
 import SimplexNoise from "simplex-noise";
 import * as THREE from "three";
-import Chat from 'twitch-chat-emotes';
+import TwitchChat from "twitch-chat-emotes-threejs";
 import { FBXLoader } from './fbxloader/FBXLoader.js';
 
 const simplex = new SimplexNoise();
+
+/*
+** connect to twitch chat
+*/
 
 // a default array of twitch channels to join
 let channels = ['moonmoon'];
@@ -11,23 +15,27 @@ let channels = ['moonmoon'];
 // the following few lines of code will allow you to add ?channels=channel1,channel2,channel3 to the URL in order to override the default array of channels
 const query_vars = {};
 const query_parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
-    query_vars[key] = value;
+	query_vars[key] = value;
 });
 
 if (query_vars.channels) {
-    channels = query_vars.channels.split(',');
+	channels = query_vars.channels.split(',');
 }
 
-// create our chat instance
-const ChatInstance = new Chat({
-    channels,
+const ChatInstance = new TwitchChat({
+	// If using planes, consider using MeshBasicMaterial instead of SpriteMaterial
+	materialType: THREE.SpriteMaterial,
+
+	// Passed to material options
+	materialOptions: {
+		transparent: true,
+	},
+
+	channels,
     duplicateEmoteLimit: 1,
     maximumEmoteLimit: 3,
-});
+})
 
-const emoteSources = {};
-const emoteTextures = {};
-const emoteMaterials = {};
 let borpa = false;
 const borpaScale = 0.02;
 
@@ -83,14 +91,6 @@ function draw() {
         borpa.scale.setScalar(((Math.sin(Date.now() / 30000) / 2 + 0.5) * 0.75 + 0.25) * borpaScale);
     } catch (e) { }
 
-    // update materials for animated emotes
-    for (const key in emoteMaterials) {
-        if (Object.hasOwnProperty.call(emoteMaterials, key)) {
-            emoteMaterials[key].needsUpdate = true;
-            emoteTextures[key].needsUpdate = true;
-        }
-    }
-
     for (let index = emoteArray.length - 1; index >= 0; index--) {
         const element = emoteArray[index];
 
@@ -121,7 +121,7 @@ function random3DDirection() {
 // add a callback function for when a new message with emotes is sent
 const emoteSpawnDistance = 6;
 const emoteArray = [];
-ChatInstance.on("emotes", (emotes) => {
+ChatInstance.listen((emotes) => {
     const group = new THREE.Group();
 
     group.velocity = random3DDirection().multiplyScalar(Math.random() * 0.9 + 0.05);
@@ -135,21 +135,7 @@ ChatInstance.on("emotes", (emotes) => {
 
     for (let index = 0; index < emotes.length; index++) {
         const emote = emotes[index];
-
-        if (!emoteTextures[emote.id]) {
-            emoteSources[emote.id] = emote;
-            emoteTextures[emote.id] = new THREE.CanvasTexture(emote.gif.canvas);
-            emoteTextures[emote.id].emote = emote;
-            emoteTextures[emote.id].magFilter = THREE.NearestFilter;
-            setTimeout(() => {
-                emoteTextures[emote.id].needsUpdate = true;
-            }, 1000);
-            emoteMaterials[emote.id] = new THREE.SpriteMaterial({
-                map: emoteTextures[emote.id],
-                transparent: true,
-            });
-        }
-        const sprite = new THREE.Sprite(emoteMaterials[emote.id]);
+        const sprite = new THREE.Sprite(emote.material);
         sprite.position.copy(offset);
         sprite.position.x += index;
 
