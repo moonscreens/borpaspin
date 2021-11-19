@@ -55,29 +55,51 @@ const light = new THREE.AmbientLight(0xFFFFFF, 0.3); // soft white light
 scene.add(light);
 
 
-const topLight = new THREE.SpotLight(0xffffff, 1, 20, 20, 1, 0); // soft white light
+const topLight = new THREE.SpotLight(0x55ffff, 1, 20, 20, 1, 0); // soft white light
 topLight.position.set(0, 10, 0);
 topLight.lookAt(new THREE.Vector3(0, 0, 0));
 
 scene.add(topLight);
 topLight.castShadow = true;
-topLight.shadow.mapSize.width = 1024;
-topLight.shadow.mapSize.height = 1024;
+topLight.shadow.mapSize.width = 1024*2;
+topLight.shadow.mapSize.height = 1024*2;
 topLight.shadow.camera.near = 6;
 topLight.shadow.camera.far = 15;
 topLight.shadow.bias = -0.01;
 
 
 const backLight = new THREE.SpotLight(0xff0000, 2, 20, 20, 1, 0); // soft white light
-backLight.position.set(7, -7, -10);
+backLight.position.set(10, -10, -10);
 backLight.lookAt(new THREE.Vector3(0, 0, 0));
 
 scene.add(backLight);
 backLight.castShadow = true;
-backLight.shadow.mapSize.width = 1024;
-backLight.shadow.mapSize.height = 1024;
+backLight.shadow.mapSize.width = 1024*2;
+backLight.shadow.mapSize.height = 1024*2;
 backLight.shadow.camera.near = 6;
 backLight.shadow.camera.far = 15;
+
+const backLight2 = new THREE.SpotLight(0xff0000, 2, 20, 20, 1, 0); // soft white light
+backLight2.position.set(-10, -10, -10);
+backLight2.lookAt(new THREE.Vector3(0, 0, 0));
+
+scene.add(backLight2);
+backLight2.castShadow = true;
+backLight2.shadow.mapSize.width = 1024*2;
+backLight2.shadow.mapSize.height = 1024*2;
+backLight2.shadow.camera.near = 6;
+backLight2.shadow.camera.far = 15;
+
+const backLight3 = new THREE.SpotLight(0xff0000, 2, 20, 20, 1, 0); // soft white light
+backLight2.position.set(0, -10, -10);
+backLight2.lookAt(new THREE.Vector3(0, 0, 0));
+
+scene.add(backLight2);
+backLight2.castShadow = true;
+backLight2.shadow.mapSize.width = 1024*2;
+backLight2.shadow.mapSize.height = 1024*2;
+backLight2.shadow.camera.near = 6;
+backLight2.shadow.camera.far = 15;
 
 function resize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -160,6 +182,7 @@ ChatInstance.listen((emotes) => {
     for (let index = 0; index < emotes.length; index++) {
         const emote = emotes[index];
         const mesh = new THREE.Mesh(emoteGeometry, emote.material);
+		mesh.castShadow = true;
         mesh.position.copy(offset);
         mesh.position.x += index;
         mesh.lookAt(new THREE.Vector3(0, 0, 0));
