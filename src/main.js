@@ -50,6 +50,7 @@ const renderer = new THREE.WebGLRenderer({
     alpha: false
 });
 renderer.shadowMap.enabled = true;
+//renderer.shadowMap.type = THREE.BasicShadowMap;
 document.body.appendChild(renderer.domElement);
 
 const light = new THREE.AmbientLight(0xFFFFFF, 0.3); // soft white light
@@ -60,14 +61,22 @@ const lightOffset = 15;
 const lightSphere = new THREE.SphereBufferGeometry(0.1, 32, 32);
 
 const lightGroups = [];
-function groupLight (light) {
+function groupLight (light, castShadow = false) {
+	
+	topLight.add(new THREE.Mesh(
+		lightSphere,
+		new THREE.MeshBasicMaterial({
+			color: light.color,
+		})
+	));
+
 	const group = new THREE.Group();
 	group.add(light);
 	scene.add(group);
 	lightGroups.push(group);
 
 	light.position.multiplyScalar(lightOffset);
-	enableLightShadow(light);
+	if (castShadow) enableLightShadow(light);
 
 	// add light helper
 	//const helper = new SpotLightHelper(light);
@@ -77,80 +86,41 @@ function groupLight (light) {
 }
 function enableLightShadow (light) {
 	light.castShadow = true;
-	light.shadow.mapSize.width = 1024*2;
-	light.shadow.mapSize.height = 1024*2;
+	light.shadow.mapSize.width = 1024 * 2;
+	light.shadow.mapSize.height = 1024 * 2;
 	light.shadow.camera.near = 0.25;
 	light.shadow.camera.far = lightOffset * 2;
 	light.shadow.bias = -0.00001;
 }
 
 const topLight = new THREE.SpotLight(0x55ffff, 0.75, lightOffset * 3, 1, 0.1, 0); // soft white light
-topLight.add(new THREE.Mesh(
-	lightSphere,
-	new THREE.MeshBasicMaterial({
-		color: 0x55ffff,
-	})
-));
 topLight.position.set(0, 1, 0);
 topLight.position.normalize();
 topLight.lookAt(new THREE.Vector3(0, 0, 0));
-groupLight(topLight);
+groupLight(topLight, true);
 
 const topLight2 = new THREE.SpotLight(0x55ffff, 0.75, lightOffset * 3, 1, 0.1, 0); // soft white light
-topLight2.add(new THREE.Mesh(
-	lightSphere,
-	new THREE.MeshBasicMaterial({
-		color: 0x55ffff,
-	})
-));
 topLight2.position.set(0, -1, 0);
 topLight2.position.normalize();
 topLight2.lookAt(new THREE.Vector3(0, 0, 0));
-groupLight(topLight2);
+groupLight(topLight2, true);
 
 const backLight = new THREE.SpotLight(0xff4400, 0.4, lightOffset * 3, 1, 0.1, 0); // soft white light
-backLight.add(
-	new THREE.Mesh(
-		lightSphere,
-		new THREE.MeshBasicMaterial({
-			color: 0xff0000,
-		})
-	)
-);
 backLight.position.set(1, -1, -1);
 backLight.position.normalize();
 backLight.lookAt(new THREE.Vector3(0, 0, 0));
-
 groupLight(backLight);
 
 const backLight2 = new THREE.SpotLight(0xff4400, 0.4, lightOffset * 3, 1, 0.1, 0); // soft white light
-backLight2.add(
-	new THREE.Mesh(
-		lightSphere,
-		new THREE.MeshBasicMaterial({
-			color: 0xff0000,
-		})
-	)
-);
 backLight2.position.set(-1, 0, 0);
 backLight2.position.normalize();
 backLight2.lookAt(new THREE.Vector3(0, 0, 0));
-
 groupLight(backLight2);
 
 const backLight3 = new THREE.SpotLight(0xff4400, 0.4, lightOffset * 3, 1, 0.1, 0); // soft white light
-backLight3.add(
-	new THREE.Mesh(
-		lightSphere,
-		new THREE.MeshBasicMaterial({
-			color: 0xff0000,
-		})
-	)
-);
 backLight3.position.set(0, -1, 0);
 backLight3.position.normalize();
 backLight3.lookAt(new THREE.Vector3(0, 0, 0));
-
 groupLight(backLight3);
 
 function resize() {
@@ -196,12 +166,12 @@ function draw() {
         emoteArray[i].rotation.z += emoteArray[i].velocity.z * delta;
 		
 		const p = (Date.now() - emoteArray[i].dateSpawned) / emoteArray[i].lifespan;
-		if (p < 0.1) {
-			emoteArray[i].scale.setScalar(easeInOutSine(p * 10));
-		} else if (p < 0.9) {
+		if (p < 0.25) {
+			emoteArray[i].scale.setScalar(easeInOutSine(p * 4));
+		} else if (p < 0.75) {
 			emoteArray[i].scale.setScalar(1);
 		} else {
-			emoteArray[i].scale.setScalar(easeInOutSine((1 - p) * 10));
+			emoteArray[i].scale.setScalar(easeInOutSine(1-((p - 0.75) * 4)));
 		}
 
         if (p >= 1) {
