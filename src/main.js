@@ -1,8 +1,8 @@
 import SimplexNoise from "simplex-noise";
 import * as THREE from "three";
-import { PointLightHelper, SpotLightHelper } from "three";
 import TwitchChat from "twitch-chat-emotes-threejs";
 import { FBXLoader } from './fbxloader/FBXLoader.js';
+import Stats from "stats.js";
 
 const simplex = new SimplexNoise();
 
@@ -21,6 +21,13 @@ const query_parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, func
 
 if (query_vars.channels) {
     channels = query_vars.channels.split(',');
+}
+
+let stats = false;
+if (query_vars.stats) {
+	stats = new Stats();
+	stats.showPanel(1);
+	document.body.appendChild(stats.dom);
 }
 
 const ChatInstance = new TwitchChat({
@@ -135,6 +142,7 @@ window.addEventListener('resize', resize);
 let lastFrame = Date.now();
 // Called once per frame
 function draw() {
+	if (stats) stats.begin();
     window.requestAnimationFrame(draw);
 
     // number of seconds since the last frame was drawn
@@ -183,6 +191,7 @@ function draw() {
     renderer.render(scene, camera);
 
     lastFrame = Date.now();
+	if (stats) stats.end();
 }
 
 function easeInOutSine (t) {
