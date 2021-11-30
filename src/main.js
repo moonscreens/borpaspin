@@ -197,11 +197,11 @@ function draw() {
 		
 		const p = (Date.now() - emoteArray[i].dateSpawned) / emoteArray[i].lifespan;
 		if (p < 0.1) {
-			emoteArray[i].scale.setScalar(p * 10);
+			emoteArray[i].scale.setScalar(easeInOutSine(p * 10));
 		} else if (p < 0.9) {
 			emoteArray[i].scale.setScalar(1);
 		} else {
-			emoteArray[i].scale.setScalar((1 - p) * 10);
+			emoteArray[i].scale.setScalar(easeInOutSine((1 - p) * 10));
 		}
 
         if (p >= 1) {
@@ -213,6 +213,10 @@ function draw() {
     renderer.render(scene, camera);
 
     lastFrame = Date.now();
+}
+
+function easeInOutSine (t) {
+	return -0.5 * (Math.cos(Math.PI * t) - 1);
 }
 
 const spawnOffset = new THREE.Vector3(0, 0, 0);
