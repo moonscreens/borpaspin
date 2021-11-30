@@ -248,6 +248,7 @@ const borpaMaterials = [
     new THREE.MeshPhongMaterial({
         color: new THREE.Color(0xFFFFFF), // eyes
 		...borpaMatDefaults,
+		shininess: 100,
     }),
     new THREE.MeshPhongMaterial({
         color: new THREE.Color(0xC7835E), // lip
@@ -300,7 +301,7 @@ loader.load('borpa.fbx', function (object) {
     const pupilGeometry = new THREE.SphereBufferGeometry(7);
     const pupilMat = new THREE.MeshPhongMaterial({
         color: new THREE.Color(0x222222), // lip
-		...borpaMatDefaults,
+		shininess: 100,
     })
     const leftPupil = new THREE.Mesh(pupilGeometry, pupilMat);
     leftPupil.position.z = 208;
