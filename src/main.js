@@ -162,7 +162,7 @@ function draw() {
     try {
         //borpa.rotation.addScalar(delta * 100);
         borpa.rotation.x = noise1;
-        borpa.rotation.y += delta;
+        borpa.rotation.y += delta * Math.sin(Date.now() / 30000) * 2;
         borpa.rotation.z = noise2;
 
         borpa.scale.setScalar(((Math.sin(Date.now() / 30000) / 2 + 0.5) * 0.25 + 0.55) * borpaScale);
