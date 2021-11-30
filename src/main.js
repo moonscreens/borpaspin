@@ -46,7 +46,7 @@ const ChatInstance = new TwitchChat({
 })
 
 let borpa = false;
-const borpaScale = 0.02;
+const borpaScale = 0.0175;
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
 camera.position.z = 10;
@@ -164,8 +164,6 @@ function draw() {
         borpa.rotation.x = noise1;
         borpa.rotation.y += delta * Math.sin(Date.now() / 30000) * 2;
         borpa.rotation.z = noise2;
-
-        borpa.scale.setScalar(((Math.sin(Date.now() / 30000) / 2 + 0.5) * 0.25 + 0.55) * borpaScale);
     } catch (e) { }
 
     for (let i = emoteArray.length - 1; i >= 0; i--) {
