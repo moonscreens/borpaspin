@@ -1,5 +1,6 @@
 import SimplexNoise from "simplex-noise";
 import * as THREE from "three";
+import { PointLightHelper, SpotLightHelper } from "three";
 import TwitchChat from "twitch-chat-emotes-threejs";
 import { FBXLoader } from './fbxloader/FBXLoader.js';
 
@@ -24,7 +25,7 @@ if (query_vars.channels) {
 
 const ChatInstance = new TwitchChat({
     // If using planes, consider using MeshBasicMaterial instead of SpriteMaterial
-    materialType: THREE.MeshLambertMaterial,
+    materialType: THREE.MeshPhongMaterial,
 
     // Passed to material options
     materialOptions: {
@@ -55,7 +56,7 @@ const light = new THREE.AmbientLight(0xFFFFFF, 0.3); // soft white light
 scene.add(light);
 
 
-const lightOffset = 7;
+const lightOffset = 15;
 const lightSphere = new THREE.SphereBufferGeometry(0.1, 32, 32);
 
 const lightGroups = [];
@@ -64,17 +65,26 @@ function groupLight (light) {
 	group.add(light);
 	scene.add(group);
 	lightGroups.push(group);
+
+	light.position.multiplyScalar(lightOffset);
+	enableLightShadow(light);
+
+	// add light helper
+	//const helper = new SpotLightHelper(light);
+	//scene.add(helper);
+
 	return group;
 }
 function enableLightShadow (light) {
 	light.castShadow = true;
 	light.shadow.mapSize.width = 1024*2;
 	light.shadow.mapSize.height = 1024*2;
-	light.shadow.camera.near = 0.1;
-	light.shadow.camera.far = lightOffset * 3;
+	light.shadow.camera.near = 0.25;
+	light.shadow.camera.far = lightOffset * 2;
+	light.shadow.bias = -0.00001;
 }
 
-const topLight = new THREE.SpotLight(0x55ffff, 0.75, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+const topLight = new THREE.SpotLight(0x55ffff, 0.75, lightOffset * 3, 1, 0.1, 0); // soft white light
 topLight.add(new THREE.Mesh(
 	lightSphere,
 	new THREE.MeshBasicMaterial({
@@ -83,12 +93,10 @@ topLight.add(new THREE.Mesh(
 ));
 topLight.position.set(0, 1, 0);
 topLight.position.normalize();
-topLight.position.multiplyScalar(lightOffset);
 topLight.lookAt(new THREE.Vector3(0, 0, 0));
-enableLightShadow(topLight);
 groupLight(topLight);
 
-const topLight2 = new THREE.SpotLight(0x55ffff, 0.75, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+const topLight2 = new THREE.SpotLight(0x55ffff, 0.75, lightOffset * 3, 1, 0.1, 0); // soft white light
 topLight2.add(new THREE.Mesh(
 	lightSphere,
 	new THREE.MeshBasicMaterial({
@@ -97,12 +105,10 @@ topLight2.add(new THREE.Mesh(
 ));
 topLight2.position.set(0, -1, 0);
 topLight2.position.normalize();
-topLight2.position.multiplyScalar(lightOffset);
 topLight2.lookAt(new THREE.Vector3(0, 0, 0));
-enableLightShadow(topLight2);
 groupLight(topLight2);
 
-const backLight = new THREE.SpotLight(0xff4400, 0.4, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+const backLight = new THREE.SpotLight(0xff4400, 0.4, lightOffset * 3, 1, 0.1, 0); // soft white light
 backLight.add(
 	new THREE.Mesh(
 		lightSphere,
@@ -113,13 +119,11 @@ backLight.add(
 );
 backLight.position.set(1, -1, -1);
 backLight.position.normalize();
-backLight.position.multiplyScalar(lightOffset);
 backLight.lookAt(new THREE.Vector3(0, 0, 0));
-enableLightShadow(backLight);
 
 groupLight(backLight);
 
-const backLight2 = new THREE.SpotLight(0xff4400, 0.4, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+const backLight2 = new THREE.SpotLight(0xff4400, 0.4, lightOffset * 3, 1, 0.1, 0); // soft white light
 backLight2.add(
 	new THREE.Mesh(
 		lightSphere,
@@ -130,13 +134,11 @@ backLight2.add(
 );
 backLight2.position.set(-1, 0, 0);
 backLight2.position.normalize();
-backLight2.position.multiplyScalar(lightOffset);
 backLight2.lookAt(new THREE.Vector3(0, 0, 0));
-enableLightShadow(backLight2);
 
 groupLight(backLight2);
 
-const backLight3 = new THREE.SpotLight(0xff4400, 0.4, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+const backLight3 = new THREE.SpotLight(0xff4400, 0.4, lightOffset * 3, 1, 0.1, 0); // soft white light
 backLight3.add(
 	new THREE.Mesh(
 		lightSphere,
@@ -147,9 +149,7 @@ backLight3.add(
 );
 backLight3.position.set(0, -1, 0);
 backLight3.position.normalize();
-backLight3.position.multiplyScalar(lightOffset);
 backLight3.lookAt(new THREE.Vector3(0, 0, 0));
-enableLightShadow(backLight3);
 
 groupLight(backLight3);
 
@@ -246,6 +246,7 @@ ChatInstance.listen((emotes) => {
         const emote = emotes[index];
         const mesh = new THREE.Mesh(emoteGeometry, emote.material);
 		mesh.castShadow = true;
+		mesh.receiveShadow = true;
         mesh.position.copy(offset);
         mesh.position.x += index;
         mesh.lookAt(new THREE.Vector3(0, 0, 0));
