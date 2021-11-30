@@ -55,13 +55,18 @@ const light = new THREE.AmbientLight(0xFFFFFF, 0.3); // soft white light
 scene.add(light);
 
 
-const lightGroup = new THREE.Group();
 const lightOffset = 7;
-scene.add(lightGroup);
 const lightSphere = new THREE.SphereBufferGeometry(0.1, 32, 32);
 
+const lightGroups = [];
+function groupLight (light) {
+	const group = new THREE.Group();
+	group.add(light);
+	scene.add(group);
+	lightGroups.push(group);
+	return group;
+}
 function enableLightShadow (light) {
-
 	light.castShadow = true;
 	light.shadow.mapSize.width = 1024*2;
 	light.shadow.mapSize.height = 1024*2;
@@ -69,7 +74,7 @@ function enableLightShadow (light) {
 	light.shadow.camera.far = lightOffset * 3;
 }
 
-const topLight = new THREE.SpotLight(0x55ffff, 1, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+const topLight = new THREE.SpotLight(0x55ffff, 0.75, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
 topLight.add(new THREE.Mesh(
 	lightSphere,
 	new THREE.MeshBasicMaterial({
@@ -81,10 +86,23 @@ topLight.position.normalize();
 topLight.position.multiplyScalar(lightOffset);
 topLight.lookAt(new THREE.Vector3(0, 0, 0));
 enableLightShadow(topLight);
+groupLight(topLight);
 
-lightGroup.add(topLight);
+const topLight2 = new THREE.SpotLight(0x55ffff, 0.75, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+topLight2.add(new THREE.Mesh(
+	lightSphere,
+	new THREE.MeshBasicMaterial({
+		color: 0x55ffff,
+	})
+));
+topLight2.position.set(0, -1, 0);
+topLight2.position.normalize();
+topLight2.position.multiplyScalar(lightOffset);
+topLight2.lookAt(new THREE.Vector3(0, 0, 0));
+enableLightShadow(topLight2);
+groupLight(topLight2);
 
-const backLight = new THREE.SpotLight(0xff0000, 0.25, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+const backLight = new THREE.SpotLight(0xff4400, 0.4, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
 backLight.add(
 	new THREE.Mesh(
 		lightSphere,
@@ -99,9 +117,9 @@ backLight.position.multiplyScalar(lightOffset);
 backLight.lookAt(new THREE.Vector3(0, 0, 0));
 enableLightShadow(backLight);
 
-lightGroup.add(backLight);
+groupLight(backLight);
 
-const backLight2 = new THREE.SpotLight(0xff0000, 0.25, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+const backLight2 = new THREE.SpotLight(0xff4400, 0.4, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
 backLight2.add(
 	new THREE.Mesh(
 		lightSphere,
@@ -116,9 +134,9 @@ backLight2.position.multiplyScalar(lightOffset);
 backLight2.lookAt(new THREE.Vector3(0, 0, 0));
 enableLightShadow(backLight2);
 
-lightGroup.add(backLight2);
+groupLight(backLight2);
 
-const backLight3 = new THREE.SpotLight(0xff0000, 0.25, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+const backLight3 = new THREE.SpotLight(0xff4400, 0.4, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
 backLight3.add(
 	new THREE.Mesh(
 		lightSphere,
@@ -133,7 +151,7 @@ backLight3.position.multiplyScalar(lightOffset);
 backLight3.lookAt(new THREE.Vector3(0, 0, 0));
 enableLightShadow(backLight3);
 
-lightGroup.add(backLight3);
+groupLight(backLight3);
 
 function resize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -155,9 +173,13 @@ function draw() {
     const noise1 = simplex.noise4D(1, 0, 0, Date.now() / 9000);
     const noise2 = simplex.noise4D(0, 0, 1, Date.now() / 9000);
 
-	lightGroup.rotation.x = simplex.noise3D(1, 0, 0 + Date.now()/30000) * Math.PI;
-	lightGroup.rotation.y = simplex.noise3D(0, 1, 0 + Date.now()/30000) * Math.PI;
-	lightGroup.rotation.z = simplex.noise3D(0, 0, 1 + Date.now()/30000) * Math.PI;
+	for (let index = 0; index < lightGroups.length; index++) {
+		const element = lightGroups[index];
+		element.rotation.x = simplex.noise3D(1, 0 + index * 1000, 0 + Date.now()/30000) * Math.PI;
+		element.rotation.y = simplex.noise3D(0, 1 + index * 1000, 0 + Date.now()/30000) * Math.PI;
+		element.rotation.z = simplex.noise3D(0, 0 + index * 1000, 1 + Date.now()/30000) * Math.PI;
+		
+	}
 
     try {
         //borpa.rotation.addScalar(delta * 100);
