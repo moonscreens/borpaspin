@@ -210,7 +210,7 @@ function random3DDirection(noiseScalar = 0.001) {
 // add a callback function for when a new message with emotes is sent
 const emoteSpawnDistance = 4;
 const emoteArray = [];
-const emoteGeometry = new THREE.PlaneBufferGeometry(1, 1);
+const emoteGeometry = new THREE.PlaneBufferGeometry(1, 1, 1, 1);
 ChatInstance.listen((emotes) => {
     const group = new THREE.Group();
 
@@ -238,26 +238,25 @@ ChatInstance.listen((emotes) => {
 
 
 const borpaMaterials = [
-    new THREE.MeshStandardMaterial({
+    new THREE.MeshPhongMaterial({
         color: new THREE.Color(0x22B14C), // skin
     }),
-    new THREE.MeshStandardMaterial({
+    new THREE.MeshPhongMaterial({
         color: new THREE.Color(0xFFFFFF), // eyes
     }),
-    new THREE.MeshStandardMaterial({
+    new THREE.MeshPhongMaterial({
         color: new THREE.Color(0xC7835E), // lip
     }),
-    new THREE.MeshStandardMaterial({
+    new THREE.MeshPhongMaterial({
         color: new THREE.Color(0xC7835E), // lip
     }),
-    new THREE.MeshStandardMaterial({
+    new THREE.MeshPhongMaterial({
         color: new THREE.Color(0x3F48CC), // clothes
     })
 ];
 for (let index = 0; index < borpaMaterials.length; index++) {
     const element = borpaMaterials[index];
-	element.metalness = 0.25;
-	element.roughness = 0.5;
+	element.shininess = 50;
 }
 
 const loader = new FBXLoader();
