@@ -237,27 +237,32 @@ ChatInstance.listen((emotes) => {
 })
 
 
+const borpaMatDefaults = {
+	shininess: 50,
+}
 const borpaMaterials = [
     new THREE.MeshPhongMaterial({
         color: new THREE.Color(0x22B14C), // skin
+		...borpaMatDefaults,
     }),
     new THREE.MeshPhongMaterial({
         color: new THREE.Color(0xFFFFFF), // eyes
+		...borpaMatDefaults,
     }),
     new THREE.MeshPhongMaterial({
         color: new THREE.Color(0xC7835E), // lip
+		...borpaMatDefaults,
     }),
     new THREE.MeshPhongMaterial({
         color: new THREE.Color(0xC7835E), // lip
+		...borpaMatDefaults,
     }),
     new THREE.MeshPhongMaterial({
         color: new THREE.Color(0x3F48CC), // clothes
+		...borpaMatDefaults,
+		shininess: 0,
     })
 ];
-for (let index = 0; index < borpaMaterials.length; index++) {
-    const element = borpaMaterials[index];
-	element.shininess = 50;
-}
 
 const loader = new FBXLoader();
 loader.load('borpa.fbx', function (object) {
@@ -293,10 +298,10 @@ loader.load('borpa.fbx', function (object) {
     });
 
     const pupilGeometry = new THREE.SphereBufferGeometry(7);
-    const pupilMat = new THREE.MeshLambertMaterial({
-        color: 0x222222,
-        side: THREE.DoubleSide,
-    });
+    const pupilMat = new THREE.MeshPhongMaterial({
+        color: new THREE.Color(0x222222), // lip
+		...borpaMatDefaults,
+    })
     const leftPupil = new THREE.Mesh(pupilGeometry, pupilMat);
     leftPupil.position.z = 208;
     leftPupil.position.y = 87;
