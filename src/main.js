@@ -24,7 +24,7 @@ if (query_vars.channels) {
 
 const ChatInstance = new TwitchChat({
     // If using planes, consider using MeshBasicMaterial instead of SpriteMaterial
-    materialType: THREE.MeshBasicMaterial,
+    materialType: THREE.MeshLambertMaterial,
 
     // Passed to material options
     materialOptions: {
@@ -55,51 +55,85 @@ const light = new THREE.AmbientLight(0xFFFFFF, 0.3); // soft white light
 scene.add(light);
 
 
-const topLight = new THREE.SpotLight(0x55ffff, 1, 20, 20, 1, 0); // soft white light
-topLight.position.set(0, 10, 0);
+const lightGroup = new THREE.Group();
+const lightOffset = 7;
+scene.add(lightGroup);
+const lightSphere = new THREE.SphereBufferGeometry(0.1, 32, 32);
+
+function enableLightShadow (light) {
+
+	light.castShadow = true;
+	light.shadow.mapSize.width = 1024*2;
+	light.shadow.mapSize.height = 1024*2;
+	light.shadow.camera.near = 0.1;
+	light.shadow.camera.far = lightOffset * 3;
+}
+
+const topLight = new THREE.SpotLight(0x55ffff, 1, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+topLight.add(new THREE.Mesh(
+	lightSphere,
+	new THREE.MeshBasicMaterial({
+		color: 0x55ffff,
+	})
+));
+topLight.position.set(0, 1, 0);
+topLight.position.normalize();
+topLight.position.multiplyScalar(lightOffset);
 topLight.lookAt(new THREE.Vector3(0, 0, 0));
+enableLightShadow(topLight);
 
-scene.add(topLight);
-topLight.castShadow = true;
-topLight.shadow.mapSize.width = 1024*2;
-topLight.shadow.mapSize.height = 1024*2;
-topLight.shadow.camera.near = 6;
-topLight.shadow.camera.far = 15;
-topLight.shadow.bias = -0.01;
+lightGroup.add(topLight);
 
-
-const backLight = new THREE.SpotLight(0xff0000, 2, 20, 20, 1, 0); // soft white light
-backLight.position.set(10, -10, -10);
+const backLight = new THREE.SpotLight(0xff0000, 0.25, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+backLight.add(
+	new THREE.Mesh(
+		lightSphere,
+		new THREE.MeshBasicMaterial({
+			color: 0xff0000,
+		})
+	)
+);
+backLight.position.set(1, -1, -1);
+backLight.position.normalize();
+backLight.position.multiplyScalar(lightOffset);
 backLight.lookAt(new THREE.Vector3(0, 0, 0));
+enableLightShadow(backLight);
 
-scene.add(backLight);
-backLight.castShadow = true;
-backLight.shadow.mapSize.width = 1024*2;
-backLight.shadow.mapSize.height = 1024*2;
-backLight.shadow.camera.near = 6;
-backLight.shadow.camera.far = 15;
+lightGroup.add(backLight);
 
-const backLight2 = new THREE.SpotLight(0xff0000, 2, 20, 20, 1, 0); // soft white light
-backLight2.position.set(-10, -10, -10);
+const backLight2 = new THREE.SpotLight(0xff0000, 0.25, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+backLight2.add(
+	new THREE.Mesh(
+		lightSphere,
+		new THREE.MeshBasicMaterial({
+			color: 0xff0000,
+		})
+	)
+);
+backLight2.position.set(-1, 0, 0);
+backLight2.position.normalize();
+backLight2.position.multiplyScalar(lightOffset);
 backLight2.lookAt(new THREE.Vector3(0, 0, 0));
+enableLightShadow(backLight2);
 
-scene.add(backLight2);
-backLight2.castShadow = true;
-backLight2.shadow.mapSize.width = 1024*2;
-backLight2.shadow.mapSize.height = 1024*2;
-backLight2.shadow.camera.near = 6;
-backLight2.shadow.camera.far = 15;
+lightGroup.add(backLight2);
 
-const backLight3 = new THREE.SpotLight(0xff0000, 2, 20, 20, 1, 0); // soft white light
-backLight2.position.set(0, -10, -10);
-backLight2.lookAt(new THREE.Vector3(0, 0, 0));
+const backLight3 = new THREE.SpotLight(0xff0000, 0.25, lightOffset * 3, lightOffset * 3, 0.1, 0); // soft white light
+backLight3.add(
+	new THREE.Mesh(
+		lightSphere,
+		new THREE.MeshBasicMaterial({
+			color: 0xff0000,
+		})
+	)
+);
+backLight3.position.set(0, -1, 0);
+backLight3.position.normalize();
+backLight3.position.multiplyScalar(lightOffset);
+backLight3.lookAt(new THREE.Vector3(0, 0, 0));
+enableLightShadow(backLight3);
 
-scene.add(backLight2);
-backLight2.castShadow = true;
-backLight2.shadow.mapSize.width = 1024*2;
-backLight2.shadow.mapSize.height = 1024*2;
-backLight2.shadow.camera.near = 6;
-backLight2.shadow.camera.far = 15;
+lightGroup.add(backLight3);
 
 function resize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -110,8 +144,6 @@ resize();
 window.addEventListener('resize', resize);
 
 
-let rotationVelocity = new THREE.Vector3();
-
 let lastFrame = Date.now();
 // Called once per frame
 function draw() {
@@ -120,20 +152,20 @@ function draw() {
     // number of seconds since the last frame was drawn
     const delta = (Date.now() - lastFrame) / 1000;
 
-    const noise1 = simplex.noise4D(1, 0, 0, Date.now() / 3000);
-    const noise2 = simplex.noise4D(0, 1, 0, Date.now() / 3000);
-    const noise3 = simplex.noise4D(0, 0, 1, Date.now() / 3000);
-    rotationVelocity.x = noise1;
-    rotationVelocity.y = noise2;
-    rotationVelocity.z = noise3;
+    const noise1 = simplex.noise4D(1, 0, 0, Date.now() / 9000);
+    const noise2 = simplex.noise4D(0, 0, 1, Date.now() / 9000);
+
+	lightGroup.rotation.x = simplex.noise3D(1, 0, 0 + Date.now()/30000) * Math.PI;
+	lightGroup.rotation.y = simplex.noise3D(0, 1, 0 + Date.now()/30000) * Math.PI;
+	lightGroup.rotation.z = simplex.noise3D(0, 0, 1 + Date.now()/30000) * Math.PI;
 
     try {
         //borpa.rotation.addScalar(delta * 100);
-        borpa.rotation.x += delta * rotationVelocity.x;
-        borpa.rotation.y += delta * rotationVelocity.y * 2;
-        borpa.rotation.z += delta * rotationVelocity.z;
+        borpa.rotation.x = noise1;
+        borpa.rotation.y += delta;
+        borpa.rotation.z = noise2;
 
-        borpa.scale.setScalar(((Math.sin(Date.now() / 30000) / 2 + 0.5) * 0.5 + 0.25) * borpaScale);
+        borpa.scale.setScalar(((Math.sin(Date.now() / 30000) / 2 + 0.5) * 0.25 + 0.55) * borpaScale);
     } catch (e) { }
 
     for (let index = emoteArray.length - 1; index >= 0; index--) {
@@ -154,26 +186,35 @@ function draw() {
     lastFrame = Date.now();
 }
 
-function random3DDirection() {
-    const x = Math.random() * 2 - 1;
-    const y = Math.random() * 2 - 1;
-    const z = Math.random() * 2 - 1;
+const spawnOffset = new THREE.Vector3(0, 0, 0);
+setInterval(()=>{
+	spawnOffset.x = Math.random() * 2 - 1;
+	spawnOffset.y = Math.random() * 2 - 1;
+	spawnOffset.z = Math.random() * 2 - 1;
+	spawnOffset.normalize();
+}, 10000)
+
+function random3DDirection(noiseScalar = 0.001) {
+    const x = simplex.noise4D(1, 0, 0, Date.now() * noiseScalar);
+    const y = simplex.noise4D(0, 1, 0, Date.now() * noiseScalar);
+    const z = simplex.noise4D(0, 0, 1, Date.now() * noiseScalar);
     const vector = new THREE.Vector3(x, y, z);
+	vector.add(spawnOffset);
     vector.normalize();
     return vector;
 }
 
 // add a callback function for when a new message with emotes is sent
-const emoteSpawnDistance = 6;
+const emoteSpawnDistance = 4;
 const emoteArray = [];
 const emoteGeometry = new THREE.PlaneBufferGeometry(1, 1);
 ChatInstance.listen((emotes) => {
     const group = new THREE.Group();
 
-    group.velocity = random3DDirection().multiplyScalar(Math.random() * 0.9 + 0.05);
-    const distanceMult = (Math.random() / 2 + 0.5);
-    group.scale.setScalar(distanceMult);
-    const offset = random3DDirection().multiplyScalar(emoteSpawnDistance * distanceMult);
+    group.velocity = random3DDirection(0.00004).multiplyScalar(Math.random() + 0.5);
+    const distanceMult = 1 + Math.random() * 0.5;
+    //group.scale.setScalar(distanceMult);
+    const offset = random3DDirection(0.00002).multiplyScalar(emoteSpawnDistance * distanceMult);
 
     //group.position.x = Math.random() * 5 - 2.5;
     //group.position.y = Math.random() * 5 - 2.5;
@@ -195,37 +236,44 @@ ChatInstance.listen((emotes) => {
 
 
 const borpaMaterials = [
-    new THREE.MeshPhongMaterial({
-        color: new THREE.Color(0x22B14C),
+    new THREE.MeshStandardMaterial({
+        color: new THREE.Color(0x22B14C), // skin
     }),
-    new THREE.MeshPhongMaterial({
-        color: new THREE.Color(0xFFFFFF),
+    new THREE.MeshStandardMaterial({
+        color: new THREE.Color(0xFFFFFF), // eyes
     }),
-    new THREE.MeshPhongMaterial({
-        color: new THREE.Color(0xC7835E),
+    new THREE.MeshStandardMaterial({
+        color: new THREE.Color(0xC7835E), // lip
     }),
-    new THREE.MeshPhongMaterial({
-        color: new THREE.Color(0xC7835E),
+    new THREE.MeshStandardMaterial({
+        color: new THREE.Color(0xC7835E), // lip
     }),
-    new THREE.MeshPhongMaterial({
-        color: new THREE.Color(0x3F48CC),
+    new THREE.MeshStandardMaterial({
+        color: new THREE.Color(0x3F48CC), // clothes
     })
 ];
 for (let index = 0; index < borpaMaterials.length; index++) {
     const element = borpaMaterials[index];
-    element.side = THREE.DoubleSide;
-    element.flatShading = true;
+	element.metalness = 0.25;
+	element.roughness = 0.5;
 }
 
 const loader = new FBXLoader();
-loader.load('Borpa.fbx', function (object) {
-    borpa = object;
-    borpa.rotation.x = Math.random() * Math.PI * 2;
-    borpa.rotation.y = Math.random() * Math.PI * 2;
-    borpa.rotation.z = Math.random() * Math.PI * 2;
-    borpa.traverse(function (child) {
+loader.load('borpa.fbx', function (object) {
+    borpa = new THREE.Group();
+	borpa.add(object);
+	object.position.z = -70;
+	object.position.y = -20;
+    //borpa.rotation.x = Math.random() * Math.PI * 2;
+    //borpa.rotation.y = Math.random() * Math.PI * 2;
+    //borpa.rotation.z = Math.random() * Math.PI * 2;
+    object.traverse(function (child) {
         if (child.isMesh) {
-            child.geometry.computeVertexNormals(true);
+			/*const tempGeometry = new THREE.Geometry().fromBufferGeometry( child.geometry );
+			tempGeometry.mergeVertices();
+			tempGeometry.computeVertexNormals();
+			child.geometry = new THREE.BufferGeometry().fromGeometry( tempGeometry );*/
+
             child.material = borpaMaterials;
             // for (let index = 0; index < child.material.length; index++) {
             //     const mat = child.material[index];
@@ -243,28 +291,27 @@ loader.load('Borpa.fbx', function (object) {
         }
     });
 
-    const pupilGeometry = new THREE.SphereBufferGeometry(10);
+    const pupilGeometry = new THREE.SphereBufferGeometry(7);
     const pupilMat = new THREE.MeshLambertMaterial({
         color: 0x222222,
         side: THREE.DoubleSide,
     });
     const leftPupil = new THREE.Mesh(pupilGeometry, pupilMat);
-    leftPupil.position.z = 201;
-    leftPupil.position.y = 86;
-    leftPupil.position.x = -31.5;
-    borpa.add(leftPupil);
+    leftPupil.position.z = 208;
+    leftPupil.position.y = 87;
+    leftPupil.position.x = -20.3;
+    object.add(leftPupil);
 
     const rightPupil = new THREE.Mesh(pupilGeometry, pupilMat);
-    rightPupil.position.z = 208;
-    rightPupil.position.y = 65.25;
-    rightPupil.position.x = 28;
-    borpa.add(rightPupil);
+    rightPupil.position.z = 211.5;
+    rightPupil.position.y = 74;
+    rightPupil.position.x = 18.3;
+    object.add(rightPupil);
 
-    borpa.castShadow = true;
-    borpa.receiveShadow = true;
-
-    scene.add(borpa);
+    object.castShadow = true;
+    object.receiveShadow = true;
     borpa.scale.setScalar(borpaScale);
+    scene.add(borpa);
 });
 
 draw();
