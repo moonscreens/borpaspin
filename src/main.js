@@ -190,16 +190,23 @@ function draw() {
         borpa.scale.setScalar(((Math.sin(Date.now() / 30000) / 2 + 0.5) * 0.25 + 0.55) * borpaScale);
     } catch (e) { }
 
-    for (let index = emoteArray.length - 1; index >= 0; index--) {
-        const element = emoteArray[index];
+    for (let i = emoteArray.length - 1; i >= 0; i--) {
+        emoteArray[i].rotation.x += emoteArray[i].velocity.x * delta;
+        emoteArray[i].rotation.y += emoteArray[i].velocity.y * delta;
+        emoteArray[i].rotation.z += emoteArray[i].velocity.z * delta;
+		
+		const p = (Date.now() - emoteArray[i].dateSpawned) / emoteArray[i].lifespan;
+		if (p < 0.1) {
+			emoteArray[i].scale.setScalar(p * 10);
+		} else if (p < 0.9) {
+			emoteArray[i].scale.setScalar(1);
+		} else {
+			emoteArray[i].scale.setScalar((1 - p) * 10);
+		}
 
-        element.rotation.x += element.velocity.x * delta;
-        element.rotation.y += element.velocity.y * delta;
-        element.rotation.z += element.velocity.z * delta;
-
-        if (element.dateSpawned < Date.now() - 10000) {
-            scene.remove(element);
-            emoteArray.splice(index, 1);
+        if (p >= 1) {
+            scene.remove(emoteArray[i]);
+            emoteArray.splice(i, 1);
         }
     }
 
@@ -235,12 +242,10 @@ ChatInstance.listen((emotes) => {
 
     group.velocity = random3DDirection(0.00004).multiplyScalar(Math.random() + 0.5);
     const distanceMult = 1 + Math.random() * 0.5;
-    //group.scale.setScalar(distanceMult);
     const offset = random3DDirection(0.00002).multiplyScalar(emoteSpawnDistance * distanceMult);
 
-    //group.position.x = Math.random() * 5 - 2.5;
-    //group.position.y = Math.random() * 5 - 2.5;
     group.dateSpawned = Date.now();
+	group.lifespan = 7000 + Math.random() * 10000;
 
     for (let index = 0; index < emotes.length; index++) {
         const emote = emotes[index];
