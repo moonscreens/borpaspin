@@ -245,7 +245,7 @@ ChatInstance.listen((emotes) => {
 
 new THREE.TextureLoader().load('/space.avif', (texture) => {
 	const envMap = texture;
-	envMap.mapping = THREE.EquirectangularReflectionMapping;
+	envMap.mapping = THREE.EquirectangularRefractionMapping;
 
 	scene.environment = envMap;
 
@@ -256,9 +256,9 @@ new THREE.TextureLoader().load('/space.avif', (texture) => {
 })
 
 const borpaMatDefaults = {
-	shininess: 50,
+	shininess: 25,
 	reflectivity: 0.25,
-	refractionRatio: 0.98
+	refractionRatio: 0.97,
 }
 const borpaMaterials = [
 	new THREE.MeshPhongMaterial({
