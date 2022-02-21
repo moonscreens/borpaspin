@@ -257,7 +257,7 @@ new THREE.TextureLoader().load('/space.avif', (texture) => {
 
 const borpaMatDefaults = {
 	shininess: 25,
-	reflectivity: 0.25,
+	reflectivity: 0.3,
 	refractionRatio: 0.97,
 }
 const borpaMaterials = [
