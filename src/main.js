@@ -139,14 +139,15 @@ function resize() {
 window.addEventListener('resize', resize);
 
 
-let lastFrame = Date.now();
+let lastFrame = performance.now();
 // Called once per frame
 function draw() {
 	if (stats) stats.begin();
 	window.requestAnimationFrame(draw);
 
 	// number of seconds since the last frame was drawn
-	const delta = (Date.now() - lastFrame) / 1000;
+	const delta = (performance.now() - lastFrame) / 1000;
+	lastFrame = performance.now();
 
 	const noise1 = simplex.noise4D(1, 0, 0, Date.now() / 9000);
 	const noise2 = simplex.noise4D(0, 0, 1, Date.now() / 9000);
@@ -188,7 +189,6 @@ function draw() {
 
 	composer.render();
 
-	lastFrame = Date.now();
 	if (stats) stats.end();
 }
 
