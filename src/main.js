@@ -93,11 +93,11 @@ function groupLight(light, castShadow = false) {
 }
 function enableLightShadow(light) {
 	light.castShadow = true;
-	light.shadow.mapSize.width = 1024 * 3;
-	light.shadow.mapSize.height = 1024 * 3;
+	light.shadow.mapSize.width = 512;
+	light.shadow.mapSize.height = 512;
 	light.shadow.camera.near = 0.25;
 	light.shadow.camera.far = lightOffset * 2;
-	light.shadow.bias = -0.00001;
+	light.shadow.bias = -0.0004;
 }
 
 const topLight = new THREE.SpotLight(0x55ffff, 0.75, lightOffset * 3, 1, 0.1, 0); // soft white light
