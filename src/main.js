@@ -97,16 +97,16 @@ function enableLightShadow(light) {
 	light.shadow.mapSize.height = 512;
 	light.shadow.camera.near = 0.25;
 	light.shadow.camera.far = lightOffset * 2;
-	light.shadow.bias = -0.0004;
+	light.shadow.bias = -0.00008;
 }
 
-const topLight = new THREE.SpotLight(0x55ffff, 0.75, lightOffset * 3, 1, 0.1, 0); // soft white light
+const topLight = new THREE.SpotLight(0x55ffff, 0.6, lightOffset * 3, 1, 0.1, 0); // soft white light
 topLight.position.set(0, 1, 0);
 topLight.position.normalize();
 topLight.lookAt(new THREE.Vector3(0, 0, 0));
 groupLight(topLight, true);
 
-const topLight2 = new THREE.SpotLight(0x55ffff, 0.75, lightOffset * 3, 1, 0.1, 0); // soft white light
+const topLight2 = new THREE.SpotLight(0x55ffff, 0.6, lightOffset * 3, 1, 0.1, 0); // soft white light
 topLight2.position.set(0, -1, 0);
 topLight2.position.normalize();
 topLight2.lookAt(new THREE.Vector3(0, 0, 0));
