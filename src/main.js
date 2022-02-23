@@ -247,8 +247,6 @@ const borpaMatDefaults = {
 	shininess: 25,
 	reflectivity: 0.32,
 	refractionRatio: 0.97,
-	transparent: true,
-	opacity: 0.95,
 }
 const borpaMaterials = [
 	new THREE.MeshPhongMaterial({
