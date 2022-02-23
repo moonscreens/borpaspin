@@ -243,18 +243,6 @@ ChatInstance.listen((emotes) => {
 	emoteArray.push(group);
 })
 
-new THREE.TextureLoader().load('/space.avif', (texture) => {
-	const envMap = texture;
-	envMap.mapping = THREE.EquirectangularRefractionMapping;
-
-	scene.environment = envMap;
-
-	borpaMaterials.forEach(element => {
-		element.envMap = envMap;
-		element.needsUpdate = true;
-	});
-})
-
 const borpaMatDefaults = {
 	shininess: 25,
 	reflectivity: 0.32,
