@@ -344,6 +344,9 @@ loader.load('borpa.fbx', function (object) {
 	rightPupil.position.x = 18.3;
 	object.add(rightPupil);
 
+	ssrSelects.push(leftPupil);
+	ssrSelects.push(rightPupil);
+
 	object.castShadow = true;
 	object.receiveShadow = true;
 	borpa.scale.setScalar(borpaScale);
