@@ -48,11 +48,11 @@ const ChatInstance = new TwitchChat({
 let borpa = false;
 const borpaScale = 0.0175;
 
-const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
+export const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
 camera.position.z = 10;
 
-const scene = new THREE.Scene();
-const renderer = new THREE.WebGLRenderer({
+export const scene = new THREE.Scene();
+export const renderer = new THREE.WebGLRenderer({
 	antialias: false,
 	alpha: false
 });
@@ -133,9 +133,9 @@ groupLight(backLight3);
 function resize() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	camera.aspect = window.innerWidth / window.innerHeight;
+	composer.setSize( window.innerWidth, window.innerHeight );
 	camera.updateProjectionMatrix();
 }
-resize();
 window.addEventListener('resize', resize);
 
 
@@ -186,7 +186,7 @@ function draw() {
 		}
 	}
 
-	renderer.render(scene, camera);
+	composer.render();
 
 	lastFrame = Date.now();
 	if (stats) stats.end();
@@ -259,6 +259,8 @@ const borpaMatDefaults = {
 	shininess: 25,
 	reflectivity: 0.32,
 	refractionRatio: 0.97,
+	transparent: true,
+	opacity: 0.95,
 }
 const borpaMaterials = [
 	new THREE.MeshPhongMaterial({
@@ -346,4 +348,7 @@ loader.load('borpa.fbx', function (object) {
 	scene.add(borpa);
 });
 
+import initEffects from './effects';
+const composer = initEffects();
+resize();
 draw();
