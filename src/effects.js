@@ -17,6 +17,7 @@ export default function () {
 	
 	ssrPass.thickness = 0.018;
 	ssrPass.infiniteThick = false;
+	ssrPass.isBouncing = true;
 	ssrPass.opacity = 0.25;
 	composer.addPass(ssrPass);
 
