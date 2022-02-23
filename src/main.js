@@ -295,6 +295,7 @@ const borpaMaterials = [
 	}),
 ];
 
+import { ssrSelects } from "./effects";
 const loader = new FBXLoader();
 loader.load('borpa.fbx', function (object) {
 	borpa = new THREE.Group();
@@ -312,6 +313,7 @@ loader.load('borpa.fbx', function (object) {
 			child.geometry = new THREE.BufferGeometry().fromGeometry( tempGeometry );*/
 
 			child.material = borpaMaterials;
+			ssrSelects.push(child);
 			// for (let index = 0; index < child.material.length; index++) {
 			//     const mat = child.material[index];
 			//     mat.map = false;

@@ -2,6 +2,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { SSRPass } from 'three/examples/jsm/postprocessing/SSRPass';
 
 import { renderer, scene, camera } from './main';
+export const ssrSelects = [];
 
 export default function () {
 	const composer = new EffectComposer(renderer);
@@ -11,7 +12,7 @@ export default function () {
 		camera,
 		width: innerWidth,
 		height: innerHeight,
-		selects: null,
+		selects: ssrSelects,
 	});
 	
 	ssrPass.thickness = 0.018;
