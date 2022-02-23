@@ -1,8 +1,8 @@
 import SimplexNoise from "simplex-noise";
 import * as THREE from "three";
 import TwitchChat from "twitch-chat-emotes-threejs";
-import { FBXLoader } from './fbxloader/FBXLoader.js';
 import Stats from "stats.js";
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 const simplex = new SimplexNoise();
 
