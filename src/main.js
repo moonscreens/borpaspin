@@ -54,7 +54,7 @@ camera.position.z = 10;
 export const scene = new THREE.Scene();
 export const renderer = new THREE.WebGLRenderer({
 	antialias: false,
-	alpha: false
+	alpha: false,
 });
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -93,11 +93,11 @@ function groupLight(light, castShadow = false) {
 }
 function enableLightShadow(light) {
 	light.castShadow = true;
-	light.shadow.mapSize.width = 512;
-	light.shadow.mapSize.height = 512;
+	light.shadow.mapSize.width = 4096;
+	light.shadow.mapSize.height = 4096;
 	light.shadow.camera.near = 0.25;
 	light.shadow.camera.far = lightOffset * 2;
-	light.shadow.bias = -0.00008;
+	light.shadow.bias = -0.000001;
 }
 
 const topLight = new THREE.SpotLight(0x55ffff, 0.6, lightOffset * 3, 1, 0.1, 0); // soft white light
